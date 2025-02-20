@@ -1,0 +1,28 @@
+---
+title: "Exploratory"
+author: "Bradley Paye"
+date: "2025-02-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Motivation
+
+A large literature studies price bubbles in the context of experimental asset markets. It is well known that such markets frequently produce bubbles in the sense of prolonged, upward deviations of asset prices from (known) fundamental value. However, theoretical models of rational bubbles imply specific forms of dynamics that amount to explosive price growth, or ``explosiveness.'' Although studies based on experimental asset markets typically report summary measures that plausibly suggest this form of price dynamics, we are aware of few studies that explicit test for explosiveness. In this paper, we apply time series econometric methods designed to test for the presence of explosive dynamics in prices. 
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
