@@ -71,7 +71,43 @@ It is common to transform the previous equation as follows in order to convert t
 $$
 \Delta y_{t} = y_{t} - y_{t-1} = \alpha + \beta y_{t-1} + \nu_{t},
 $$
-where we have the relation $\beta = \rho - 1$ and now the null is that $\beta = 0$. 
+where we have the relation $\beta = \rho - 1$ and now the null is that $\beta = 0$ and the alternative $\beta < 0$. 
 
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r adftest}
+y <- rw[,1]
+yy <- y[2:100]
+xx <- y[1:99]
+dy <- yy-xx
+
+#Dickey-fuller by hand
+df_reg <- lm(dy ~ xx)
+summary(df_reg)
+
+#set adf lags and model type
+testlag <- 0
+testmlag <- 5
+modtype <- 1 #w/ constant and w/o trend
+
+#This confirms that ADF w/ zero lags = DF
+test_adf <- ADF_FL(y, adflag = testlag, mflag = modtype)
+test_adf
+
+test2_adf <- ADF_IC(y, adflag=testmlag, mflag=modtype, IC = 2)
+test2_adf
+
+#backward ADF crit values
+foo <- badf(m = 100, t = 100, adflag = testlag, mflag = modtype)
+```
+```{r more adf}
+library(tseries)
+tryit <- adf.test(y,alternative = "s",k=testlag)
+tryit
+
+#reconcile with above by showing that test includes trend
+modtype <- 2
+test_adf <- ADF_FL(y, adflag = testlag, mflag = modtype)
+test_adf
+
+```
