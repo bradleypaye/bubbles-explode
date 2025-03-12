@@ -111,3 +111,18 @@ test_adf <- ADF_FL(y, adflag = testlag, mflag = modtype)
 test_adf
 
 ```
+## Algorithm Summary
+The algorithm proceeds as follows:
+
+1. Obtain the minimal window length as integer part of $(0.01 + 1.8/\sqrt{T})T$. Call this $T^{\ast}$. Example: $T=100$, we have $0.19(T) = 19$ observations.
+2. Run ADF regressions recursively forward starting with the initial $T^{\ast}$ observations. Retain the resulting ADF statistics. *Notea*: The Multiple Bubbles package function applies ADF tests with lag length determined by an information criterion set by user to either AIC or BIC. The model type (const,const and trend, no constant) must be set by the user, as well as the max lag. It seems there are no defaults so these must be explicitly set for the sadf_gadf function.
+3. The SADF statistic equals the max of the recursive ADF statistics from the previous step. Inference is based on simulated critial values. 
+```{r do sadf_gadf}
+
+adflag_opt = 4  #max lag set to 4
+mflag_opt = 1  #this is constant model
+ICopt = 1  #1 = AIC
+sadf_out <- sadf_gadf(y,adflag_opt,mflag_opt,ICopt)
+sadf_out
+
+```
