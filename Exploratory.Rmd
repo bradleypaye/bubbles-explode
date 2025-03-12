@@ -23,6 +23,7 @@ In the following, we load up the package and do some very basic stuff.
 library(MultipleBubbles)
 
 #simulate a set of random walks with 1/n drift
+set.seed(29)
 
 #set parameters
 nseries <- 10
@@ -111,18 +112,26 @@ test_adf <- ADF_FL(y, adflag = testlag, mflag = modtype)
 test_adf
 
 ```
-## Algorithm Summary
+## SADF Algorithm Summary
 The algorithm proceeds as follows:
 
 1. Obtain the minimal window length as integer part of $(0.01 + 1.8/\sqrt{T})T$. Call this $T^{\ast}$. Example: $T=100$, we have $0.19(T) = 19$ observations.
-2. Run ADF regressions recursively forward starting with the initial $T^{\ast}$ observations. Retain the resulting ADF statistics. *Notea*: The Multiple Bubbles package function applies ADF tests with lag length determined by an information criterion set by user to either AIC or BIC. The model type (const,const and trend, no constant) must be set by the user, as well as the max lag. It seems there are no defaults so these must be explicitly set for the sadf_gadf function.
+2. Run ADF regressions recursively forward starting with the initial $T^{\ast}$ observations. Retain the resulting ADF statistics ($t$-statistics from ADF regressions). *Notes*: The Multiple Bubbles package function applies ADF tests with lag length determined by an information criterion set by the user to either AIC or BIC. The model type (const,const and trend, no constant) must be set by the user, as well as the max lag. It seems there are no defaults so these must be explicitly set for the sadf_gadf function.
 3. The SADF statistic equals the max of the recursive ADF statistics from the previous step. Inference is based on simulated critial values. 
 ```{r do sadf_gadf}
 
 adflag_opt = 4  #max lag set to 4
 mflag_opt = 1  #this is constant model
 ICopt = 1  #1 = AIC
-sadf_out <- sadf_gadf(y,adflag_opt,mflag_opt,ICopt)
-sadf_out
+gsadf_out <- sadf_gsadf(y,adflag_opt,mflag_opt,ICopt)
+gsadf_out
 
 ```
+## GSADF Algorithm Summary
+The algorithm proceeds as follows:
+
+1. Start with $T^{\ast}$ as defined above (SADF algorithm), which implies $\tilde{T} = T-T^{\ast}+1$ periods of analysis. Example: $T=100$ implies $T^{\ast}=19$ and $\tilde{T} = 100-19+1=82$ periods of analysis.
+2. Iterate from $v=1$ to the number of periods of analysis (82 in example above). Given the current value of $v$, define the set of $v$ periods running from $T^{\ast}$ to $T^{\ast} + v - 1$. Example: if $v=10$, then this is periods 19 through 28. 
+3. Compute the ADF test statistic recursively backwards, such that the first regression uses data beginning in period $v$ and ending in period $T^{\ast}+v$, and the last regression begins in period 1 and ends in period $T^{\ast}+v$. For example, when $v=10$, the first regression uses observations 10--28 (19 obs) and the last regression uses observations 1--28 (28 obs).
+4. The 'backward SADF' or BSADF statistic is the max of the ADF statistic produced in the previous steps. This is stored and $v$ is incremented by one unit, at which point the previous step is repeated until $v$ hits the max value defined in step 1. This produces $\tilde{T}$ BSADF statistics.
+5. The GSADF statistic is defined as the maximum of the BSADF statistics.
